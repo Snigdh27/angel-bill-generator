@@ -1,0 +1,24 @@
+<div class="breadcrumb">
+    <h4 style="font-weight: 400;">Customers</h4>
+</div>
+<div class="separator-breadcrumb border-top mb-5"></div>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">S.No</th>
+        <th scope="col">Customer Name</th>
+        <th scope="col">Customer Type</th>
+        <th scope="col">GSTIN Number</th>
+        <th scope="col">Mobile Number</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let customer of customers_list; let i=index">
+        <td>{{i+1}}</td>
+        <td>{{customer.name}}</td>
+        <td>{{customer.customer_type}}</td>
+        <td>{{customer.gstin_no}}</td>
+        <td>{{customer.mobile_number}}</td>
+      </tr>
+    </tbody>
+  </table>
