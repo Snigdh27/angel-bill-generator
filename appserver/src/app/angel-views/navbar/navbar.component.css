@@ -27,7 +27,7 @@ body {
 	padding-right: 50px;
 }
 .navbar .navbar-brand b {
-	color: #33cabb;		
+	color: #178bb8;		
 }
 .navbar .form-inline {
 	display: inline-block;
@@ -87,7 +87,7 @@ body {
 	font-size: 14px;
 }
 .navbar .action-form a {		
-	color: #33cabb;
+	color: #178bb8;
 	padding: 0 !important;
 	font-size: 14px;
 }
@@ -98,12 +98,12 @@ body {
 }
 .navbar .btn-primary, .navbar .btn-primary:active {
 	color: #fff;
-	background: #33cabb !important;
+	background: #178bb8 !important;
 	border: none;
 }	
 .navbar .btn-primary:hover, .navbar .btn-primary:focus {		
 	color: #fff;
-	background: #31bfb1 !important;
+	background: #178bb8 !important;
 }
 .navbar .social-btn .btn, .navbar .social-btn .btn:hover {
 	color: #fff;

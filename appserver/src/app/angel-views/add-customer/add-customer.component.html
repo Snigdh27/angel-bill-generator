@@ -8,19 +8,19 @@
         <div class="row">
             <h5 style="font-weight: 400;">Customer Details</h5>
             <div class="col-6 mb-2 mt-2">
-                <label>Type</label>
+                <label>Type<span class="text-danger">*</span></label>
                 <select class="form-control form-control-sm" formControlName="customer_type">
                     <option value="Individual">Individual</option>
                     <option value="Organisation">Organisation</option>
                 </select>
             </div>
             <div class="col-6 mb-2 mt-2">
-                <label>Name</label>
+                <label>Name<span class="text-danger">*</span></label>
                 <input type="text" class="form-control form-control-sm" formControlName="name" placeholder="Enter Name" />
             </div>
     
             <div class="col-6 mb-2">
-                <label>Phone Number</label>
+                <label>Phone Number<span class="text-danger">*</span></label>
                 <input type="text" class="form-control form-control-sm" formControlName="mobile_number"
                     placeholder="Enter Phone Number" />
             </div>
@@ -35,18 +35,20 @@
             <h5 style="font-weight: 400;">Billing Details</h5>
     
             <div class="col-6 mb-2">
-                <label>Address</label>
+                <label>Address<span class="text-danger">*</span></label>
                 <input type="text" class="form-control form-control-sm" formControlName="billing_address" placeholder="Enter Address" />
             </div>
     
             <div class="col-6 mb-2">
-                <label>GSTIN Number</label>
+                <label>GSTIN Number (Optional)</label>
                 <input type="text" class="form-control form-control-sm" formControlName="gstin_no" placeholder="Enter GST Number" />
             </div>
     
             <div class="col-6 mb-2">
-                <label>State</label>
-                <input type="text" class="form-control form-control-sm" formControlName="state" placeholder="Enter State" />
+                <label>State<span class="text-danger">*</span></label>
+                <select class="form-control form-control-sm" formControlName="state">
+                    <option *ngFor="let val of states" [value]="val">{{val}}</option>
+                </select>
             </div>
     
             <div class="col-6 mb-2">
@@ -58,5 +60,5 @@
 </div>
 
 <div class="p-2">
-    <button (click)="create_customer()" class="btn btn-sm" style="background-color: #31bfb1; color: white;">Create Customer</button>
+    <button (click)="create_customer()" class="btn btn-sm" style="background-color: #178bb8; color: white;">Create Customer</button>
 </div>
