@@ -5,3 +5,21 @@
     color: white;
     font-weight: 400;
 }
+
+.btn-primary {
+    background-color: #178bb8;
+    border-color: #178bb8;
+    color: white;
+}
+
+.btn-outline-primary {
+    color: #178bb8;
+    border: 1px solid #178bb8;
+    background-color: transparent;
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: #178bb8;
+    color: white;
+  }
+  

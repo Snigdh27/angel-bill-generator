@@ -2,3 +2,188 @@
     <h4 style="font-weight: 400;">Generate Invoice</h4>
 </div>
 <div class="separator-breadcrumb border-top"></div>
+
+<div class="invoice-container">
+    <div class="print-controls no-print">
+      <button (click)="printInvoice()" class="print-button">Print Invoice</button>
+    </div>
+    
+    <!-- Invoice Header -->
+    <div class="invoice-header">
+      <div class="company-logo">
+        <img src="assets/logo.png" alt="Company Logo">
+      </div>
+      <div class="company-details">
+        <h2>{{ companyName }}</h2>
+        <p [innerHTML]="companyAddress.split('\n').join('<br>')"></p>
+        <p><strong>GSTIN:</strong> {{ companyGstin }}</p>
+      </div>
+    </div>
+    
+    <div class="invoice-title">
+      <h1>TAX INVOICE</h1>
+    </div>
+    
+    <!-- Invoice Info -->
+    <div class="invoice-info">
+      <div class="invoice-number-date">
+        <p><strong>Invoice No:</strong> {{ invoiceNumber }}</p>
+        <p><strong>Date:</strong> {{ invoiceDate | date:'dd/MM/yyyy' }}</p>
+      </div>
+    </div>
+    
+    <!-- Customer Selection - Will not print -->
+    <div class="customer-selection no-print">
+      <label for="customer">Select Customer:</label>
+      <select id="customer" [(ngModel)]="selectedCustomerId" (change)="onCustomerChange()">
+        <option [ngValue]="null">-- Select Customer --</option>
+        <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
+      </select>
+    </div>
+    
+    <!-- Customer Details -->
+    <div class="customer-details">
+      <h3>Details of Receiver (Billed to)</h3>
+      <div class="details-box">
+        <p><strong>Name:</strong> {{ selectedCustomer?.name || 'Select a customer' }}</p>
+        <p><strong>Address:</strong> {{ selectedCustomer?.address || '' }}</p>
+        <p><strong>GSTIN:</strong> {{ selectedCustomer?.gstin || '' }}</p>
+        <p><strong>State:</strong> {{ selectedCustomer?.state || '' }}</p>
+        <p><strong>State Code:</strong> {{ selectedCustomer?.stateCode || '' }}</p>
+      </div>
+    </div>
+    
+    <!-- Invoice Items -->
+    <div class="invoice-items">
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Description of Goods</th>
+            <th>HSN/SAC</th>
+            <th>GST Rate</th>
+            <th>Quantity</th>
+            <th>Rate</th>
+            <th>Amount</th>
+            <th class="no-print">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of invoiceItems; let i = index">
+            <td>{{ item.serialNo }}</td>
+            <td>
+              <input type="text" [(ngModel)]="item.description" placeholder="Description">
+            </td>
+            <td>
+              <input type="text" [(ngModel)]="item.hsnSac" placeholder="HSN/SAC">
+            </td>
+            <td>
+              <select [(ngModel)]="item.gstRate" (change)="calculateTotals()">
+                <option *ngFor="let rate of gstRates" [value]="rate">{{ rate }}%</option>
+              </select>
+            </td>
+            <td>
+              <input type="number" [(ngModel)]="item.quantity" min="1" (change)="calculateItemAmount(item)">
+            </td>
+            <td>
+              <input type="number" [(ngModel)]="item.rate" min="0" step="0.01" (change)="calculateItemAmount(item)">
+            </td>
+            <td>{{ item.amount | indianCurrency }}</td>
+            <td class="no-print">
+              <button (click)="deleteItem(i)" class="delete-button">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="add-item no-print">
+        <button (click)="addNewItem()" class="add-button">+ Add Item</button>
+      </div>
+    </div>
+    
+    <!-- Invoice Summary -->
+    <div class="invoice-summary">
+      <div class="tax-summary">
+        <h4>Tax Summary</h4>
+        <table class="tax-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>GST 5%</th>
+              <th>GST 12%</th>
+              <th>GST 18%</th>
+              <th>GST 28%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Amt.</strong></td>
+              <td>{{ getTaxSummaryValue(5, 'taxableAmount') | indianCurrency }}</td>
+              <td>{{ getTaxSummaryValue(12, 'taxableAmount') | indianCurrency }}</td>
+              <td>{{ getTaxSummaryValue(18, 'taxableAmount') | indianCurrency }}</td>
+              <td>{{ getTaxSummaryValue(28, 'taxableAmount') | indianCurrency }}</td>
+            </tr>
+            <tr>
+              <td><strong>Tax</strong></td>
+              <td>{{ getTaxSummaryValue(5, 'tax') | indianCurrency }}</td>
+              <td>{{ getTaxSummaryValue(12, 'tax') | indianCurrency }}</td>
+              <td>{{ getTaxSummaryValue(18, 'tax') | indianCurrency }}</td>
+              <td>{{ getTaxSummaryValue(28, 'tax') | indianCurrency }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="totals">
+        <div class="total-row">
+          <span class="total-label">Total Amount (Before Tax):</span>
+          <span class="total-value">{{ subtotal | indianCurrency }}</span>
+        </div>
+        
+        <ng-container *ngIf="isSameState(); else igstBlock">
+          <div class="total-row">
+            <span class="total-label">Add: CGST:</span>
+            <span class="total-value">{{ totalCgst | indianCurrency }}</span>
+          </div>
+          <div class="total-row">
+            <span class="total-label">Add: SGST:</span>
+            <span class="total-value">{{ totalSgst | indianCurrency }}</span>
+          </div>
+        </ng-container>
+        
+        <ng-template #igstBlock>
+          <div class="total-row">
+            <span class="total-label">Add: IGST:</span>
+            <span class="total-value">{{ totalIgst | indianCurrency }}</span>
+          </div>
+        </ng-template>
+        
+        <div class="total-row grand-total">
+          <span class="total-label">Total Amount (After Tax):</span>
+          <span class="total-value">{{ grandTotal | indianCurrency }}</span>
+        </div>
+        
+        <div class="amount-in-words">
+          <p><strong>Amount in Words:</strong> {{ grandTotal | numberToWords }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Terms and Signature -->
+    <div class="terms-signature">
+      <div class="terms">
+        <h4>Terms & Conditions</h4>
+        <ol>
+          <li>Payment is due within 15 days from the date of invoice.</li>
+          <li>Goods once sold will not be taken back or exchanged.</li>
+          <li>Interest 18% p.a. will be charged on overdue bills.</li>
+        </ol>
+      </div>
+      
+      <div class="signature">
+        <p>For {{ companyName }}</p>
+        <div class="signature-space"></div>
+        <p>Authorized Signatory</p>
+      </div>
+    </div>
+  </div>

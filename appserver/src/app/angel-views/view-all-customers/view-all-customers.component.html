@@ -10,6 +10,7 @@
         <th scope="col">Customer Type</th>
         <th scope="col">GSTIN Number</th>
         <th scope="col">Mobile Number</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -19,6 +20,30 @@
         <td>{{customer.customer_type}}</td>
         <td>{{customer.gstin_no}}</td>
         <td>{{customer.mobile_number}}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" (click)="edit_customer(customer)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+          <button class="btn btn-sm btn-danger ml-2" (click)="open_delete_customer_modal(customer)" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        </td>
       </tr>
     </tbody>
   </table>
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel" style="font-weight: 400;">Delete Customer</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this customer?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-rounded btn-outline-secondary btn-sm" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-rounded btn-outline-primary btn-sm" (click)="delete_customer()" data-dismiss="modal">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,6 +1,7 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule,Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-add-customer',
@@ -43,13 +44,25 @@ export class AddCustomerComponent {
     "West Bengal"
   ]
 
+  isEditMode = false;
+  oldCustomerName = '';
+
   constructor(
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router,
+    private location: Location
   ){}
 
   ngOnInit() {
     this.initialise_payload();
+    const state = this.location.getState() as { customerData?: any };
+
+    if (state?.customerData) {
+      this.isEditMode = true;
+      this.oldCustomerName = state.customerData.name;
+      this.customer_form.patchValue(state.customerData);
+    }
   }
 
   initialise_payload(){
@@ -70,15 +83,28 @@ export class AddCustomerComponent {
   }
 
   create_customer() {
-    console.log(this.customer_form);
-    if(this.validate_customer()){
-      this.addToLocalStorageList("customer_list_data", this.customer_form.value);
-      this.customer_form.disable();
-      this.toastr.success("Customer Created Successfully");
-    } else{
+    if (this.validate_customer()) {
+      const formValue = this.customer_form.value;
+      const existingList = JSON.parse(localStorage.getItem("customer_list_data") || "[]");
+
+      if (this.isEditMode) {
+        const updatedList = existingList.map((cust: any) =>
+          cust.name === this.oldCustomerName ? formValue : cust
+        );
+        localStorage.setItem("customer_list_data", JSON.stringify(updatedList));
+        this.toastr.success("Customer Updated Successfully");
+      } else {
+        existingList.push(formValue);
+        localStorage.setItem("customer_list_data", JSON.stringify(existingList));
+        this.toastr.success("Customer Created Successfully");
+      }
+
+      this.router.navigate(['/view-all-customers']);
+    } else {
       this.toastr.error("Please fill all the required fields");
     }
   }
+  
   
   addToLocalStorageList(key: string, newEntry: any) {
     const stored = localStorage.getItem(key);
